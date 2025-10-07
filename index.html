@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gato Multijugador - Lobby</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="lobby-container">
+        <h1>Gato (Tic-Tac-Toe) en Tiempo Real</h1>
+        <div class="form-group">
+            <label for="nickname">Tu Apodo:</label>
+            <input type="text" id="nickname" placeholder="Ej: Juan" maxlength="15">
+        </div>
+
+        <div class="action-group">
+            <h2>Crear Nueva Partida</h2>
+            <button id="createGameBtn">Crear como Jugador "X"</button>
+        </div>
+
+        <div class="action-group">
+            <h2>Unirse a Partida</h2>
+            <input type="text" id="roomIdInput" placeholder="Ingresa el ID de la sala">
+            <button id="joinGameBtn">Unirse como Jugador "O"</button>
+        </div>
+    </div>
+
+    <!-- SDK de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // --- PEGA TU CONFIGURACIÓN DE FIREBASE AQUÍ ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBUuRqZMMIakjLFiVEV6egCwyKxzs6pXXc",
+            authDomain: "play-cat-cf754.firebaseapp.com",
+            databaseURL: "https://play-cat-cf754-default-rtdb.firebaseio.com",
+            projectId: "play-cat-cf754",
+            storageBucket: "play-cat-cf754.firebasestorage.app",
+            messagingSenderId: "93048951851",
+            appId: "1:93048951851:web:24a2a464f57ae8ba0a466e",
+            measurementId: "G-P4G036829P"
+        };
+        // -------------------------------------------
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const nicknameInput = document.getElementById('nickname');
+        const createGameBtn = document.getElementById('createGameBtn');
+        const joinGameBtn = document.getElementById('joinGameBtn');
+        const roomIdInput = document.getElementById('roomIdInput');
+
+        // --- Lógica para Crear Partida ---
+        createGameBtn.addEventListener('click', () => {
+            const nickname = nicknameInput.value.trim();
+            if (!nickname) {
+                alert('Por favor, ingresa un apodo.');
+                return;
+            }
+
+            // Genera un ID de sala único y simple
+            const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const gameRef = database.ref('games/' + roomId);
+
+            const initialGameState = {
+                board: Array(9).fill(' '),
+                turn: 'X',
+                scores: { X: 0, O: 0 },
+                players: {
+                    X: { name: nickname, lastActive: firebase.database.ServerValue.TIMESTAMP },
+                    O: { name: '', lastActive: null }
+                },
+                gameStarter: 'X',
+                status: 'WAITING', // Esperando a que se una el jugador O
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            gameRef.set(initialGameState).then(() => {
+                console.log(`Partida creada con ID: ${roomId}`);
+                window.location.href = `game.html?room=${roomId}&symbol=X`;
+            });
+        });
+
+        // --- Lógica para Unirse a Partida ---
+        joinGameBtn.addEventListener('click', () => {
+            const nickname = nicknameInput.value.trim();
+            const roomId = roomIdInput.value.trim().toUpperCase();
+
+            if (!nickname) {
+                alert('Por favor, ingresa un apodo.');
+                return;
+            }
+            if (!roomId) {
+                alert('Por favor, ingresa un ID de sala.');
+                return;
+            }
+
+            const gameRef = database.ref('games/' + roomId);
+
+            gameRef.once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    alert('Error: La sala no existe.');
+                    return;
+                }
+
+                const gameData = snapshot.val();
+
+                if (gameData.players.O.name !== '') {
+                    alert('Error: La sala ya está llena.');
+                    return;
+                }
+
+                // El jugador O se une, la partida comienza
+                gameRef.update({
+                    'players/O/name': nickname,
+                    'players/O/lastActive': firebase.database.ServerValue.TIMESTAMP,
+                    'status': 'IN_PROGRESS'
+                }).then(() => {
+                    console.log(`Uniéndose a la partida: ${roomId}`);
+                    window.location.href = `game.html?room=${roomId}&symbol=O`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gato - Partida en Juego</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div id="status-bar">
+            <div class="status-item">ID de Sala: <strong id="room-id"></strong></div>
+            <div class="status-item">Tiempo: <strong id="timer">00:00</strong></div>
+        </div>
+
+        <div id="game-info">
+            <div id="player-info-X" class="player-info">
+                <span id="player-name-X">Jugador X</span>
+                <span id="score-X" class="score">0</span>
+            </div>
+            <div id="turn-indicator-container">
+                <h2 id="turn-indicator">Cargando...</h2>
+            </div>
+            <div id="player-info-O" class="player-info">
+                <span id="player-name-O">Jugador O</span>
+                <span id="score-O" class="score">0</span>
+            </div>
+        </div>
+
+        <div id="board"></div>
+
+        <div id="opponent-status-container">
+            Oponente (<span id="opponent-symbol"></span>): <span id="opponent-status"></span>
+        </div>
+
+        <button id="new-round-btn" style="display: none;">Iniciar Nueva Ronda</button>
+    </div>
+
+    <!-- SDK de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- Lógica del juego -->
+    <script type="module" src="game.js"></script>
+</body>
+</html>
