@@ -7,44 +7,53 @@
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <div class="game-wrapper">
-        <div class="theme-switcher-container">
-        <input type="checkbox" id="theme-toggle" class="theme-switcher-checkbox">
-        <label for="theme-toggle" class="theme-switcher-label">
-            <span class="theme-switcher-thumb"></span>
-        </label>
-    </div>
-        <a href="/index.html" class="back-to-lobby">← Volver al Lobby</a>
-
-        <div class="game-container">
-            <div id="status-bar">
-                <div class="status-item">ID de Sala: <strong id="room-id"></strong></div>
-                <div class="status-item">Tiempo: <strong id="timer">00:00</strong></div>
-            </div>
-
-            <div id="game-info">
-                <div id="player-info-X" class="player-info">
-                    <span id="player-name-X">Jugador X</span>
-                    <span id="score-X" class="score">0</span>
-                </div>
-                <div id="turn-indicator-container">
-                    <h2 id="turn-indicator">Cargando...</h2>
-                </div>
-                <div id="player-info-O" class="player-info">
-                    <span id="player-name-O">Jugador O</span>
-                    <span id="score-O" class="score">0</span>
-                </div>
-            </div>
-
-            <div id="board"></div>
-
-            <div id="opponent-status-container">
-                Oponente (<span id="opponent-symbol"></span>): <span id="opponent-status"></span>
-            </div>
-
-            <button id="new-round-btn" class="primary-btn" style="display: none;">Iniciar Nueva Ronda</button>
+    <header class="app-header">
+        <div class="header-title">
+            <span id="header-icon"></span>
+            <h1>GATO OX</h1>
         </div>
-    </div>
+        <div class="theme-switcher-container">
+            <input type="checkbox" id="theme-toggle" class="theme-switcher-checkbox">
+            <label for="theme-toggle" class="theme-switcher-label">
+                <span class="theme-switcher-thumb"></span>
+            </label>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="game-wrapper">
+            <a href="/index.html" class="back-to-lobby">← Volver al Lobby</a>
+
+            <div class="game-container">
+                <div id="status-bar">
+                    <div class="status-item">ID de Sala: <strong id="room-id"></strong></div>
+                    <div class="status-item">Tiempo: <strong id="timer">00:00</strong></div>
+                </div>
+
+                <div id="game-info">
+                    <div id="player-info-X" class="player-info">
+                        <span id="player-name-X">Jugador X</span>
+                        <span id="score-X" class="score">0</span>
+                    </div>
+                    <div id="turn-indicator-container">
+                        <h2 id="turn-indicator">Cargando...</h2>
+                    </div>
+                    <div id="player-info-O" class="player-info">
+                        <span id="player-name-O">Jugador O</span>
+                        <span id="score-O" class="score">0</span>
+                    </div>
+                </div>
+
+                <div id="board"></div>
+
+                <div id="opponent-status-container">
+                    Oponente (<span id="opponent-symbol"></span>): <span id="opponent-status"></span>
+                </div>
+
+                <button id="new-round-btn" class="primary-btn" style="display: none;">Iniciar Nueva Ronda</button>
+            </div>
+        </div>
+    </main>
 
     <!-- Lógica del juego -->
     <script type="module" src="scripts/game.js"></script>
