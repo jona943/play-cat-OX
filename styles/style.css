@@ -230,7 +230,7 @@ input[type="text"]:focus {
 
 #turn-indicator { font-size: 1.2rem; font-weight: 600; color: var(--text-secondary); text-align: center; padding: 8px 16px; background: var(--input-bg); border-radius: 12px; }
 
-#board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: var(--input-bg); padding: 12px; border-radius: 12px; }
+#board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: var(--input-border); padding: 12px; border-radius: 12px; }
 .cell { aspect-ratio: 1 / 1; background-color: var(--bg-gradient-start); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 4.5rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease-out; box-shadow: var(--shadow-sm); border: 1px solid transparent; }
 .cell:hover { transform: scale(1.05); box-shadow: var(--shadow-md); border-color: var(--accent-primary); }
 .cell.X { color: var(--symbol-x-color); text-shadow: 0 0 15px rgba(var(--symbol-x-rgb), 0.5); }
