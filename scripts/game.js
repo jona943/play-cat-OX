@@ -1,4 +1,4 @@
-// Paso 1: Copia la configuración de Firebase
+// Paso 1: Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBUuRqZMMIakjLFiVEV6egCwyKxzs6pXXc",
   authDomain: "play-cat-cf754.firebaseapp.com",
@@ -9,32 +9,15 @@ const firebaseConfig = {
   measurementId: "G-P4G036829P"
 };
 
-// Paso 2: Importa y usa las funciones necesarias
+// Paso 2: Importaciones del SDK de Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, setDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Inicializa Firebase
+// Inicializa Firebase y Firestore
 const app = initializeApp(firebaseConfig);
-
-// Obtiene una referencia a Cloud Firestore
 const db = getFirestore(app);
 
-// ¡A partir de aquí, puedes empezar a escribir la lógica de tu juego!
-// Por ejemplo, para crear una nueva partida en la colección 'games':
-// await setDoc(doc(db, "games", "partida_123"), { /* datos del juego */ });
-
-
-// ------------------------------------------------------------------
-// -- El código anterior ha sido comentado porque usa una versión --
-// -- antigua del SDK de Firebase. Deberás adaptarlo para que    --
-// -- funcione con Firestore y el nuevo SDK modular.             --
-// ------------------------------------------------------------------
-
-/*
-
-// ** 1. INICIALIZACIÓN Y CONFIGURACIÓN **
-// firebase.initializeApp(firebaseConfig); // <- Comentado: Reemplazado por initializeApp
-// const database = firebase.database(); // <- Comentado: Reemplazado por getFirestore
+// ** 1. REFERENCIAS A ELEMENTOS DEL DOM Y ESTADO **
 
 // Referencias a elementos del DOM
 const boardDiv = document.getElementById('board');
@@ -52,8 +35,10 @@ const opponentSymbolDisplay = document.getElementById('opponent-symbol');
 // Variables de estado del juego
 let roomId, playerSymbol, opponentSymbol, gameRef, gameData;
 let heartbeatInterval, timerInterval;
+let unsubscribeGame = null; // Para detener el listener de Firebase al salir
 
-// Obtener parámetros de la URL y empezar el juego
+// ** 2. INICIALIZACIÓN DEL JUEGO **
+
 window.addEventListener('load', () => {
     const params = new URLSearchParams(window.location.search);
     roomId = params.get('room');
@@ -66,10 +51,7 @@ window.addEventListener('load', () => {
     }
 
     opponentSymbol = playerSymbol === 'X' ? 'O' : 'X';
-    // gameRef = database.ref('games/' + roomId); // <- Comentado: Necesita ser adaptado a Firestore
-    
-    // Ejemplo de cómo sería con Firestore:
-    // gameRef = doc(db, "games", roomId);
+    gameRef = doc(db, "games", roomId);
 
     roomIdDisplay.textContent = roomId;
     opponentSymbolDisplay.textContent = opponentSymbol;
@@ -81,37 +63,48 @@ window.addEventListener('load', () => {
     newRoundBtn.addEventListener('click', startNewRound);
 });
 
-// ** 2. SINCRONIZACIÓN CON FIREBASE **
+// Limpiar intervalos y listeners al salir de la página
+window.addEventListener('beforeunload', () => {
+    if (unsubscribeGame) {
+        unsubscribeGame();
+    }
+    clearInterval(heartbeatInterval);
+    clearInterval(timerInterval);
+});
+
+
+// ** 3. SINCRONIZACIÓN CON FIREBASE **
 
 /**
- * Escucha cambios en el nodo de la partida en Firebase.
+ * Escucha cambios en el documento de la partida en Firestore.
  * Esta es la función principal que mantiene el juego sincronizado.
- *
+ */
 function listenToGameChanges() {
-    // gameRef.on('value', (snapshot) => { ... }); // <- Comentado: Reemplazado por onSnapshot
-    
-    // Ejemplo de cómo sería con Firestore:
-    // onSnapshot(gameRef, (docSnap) => {
-    //     if (!docSnap.exists()) {
-    //         alert('La partida ha sido eliminada o no existe.');
-    //         window.location.href = 'index.html';
-    //         return;
-    //     }
-    //     gameData = docSnap.data();
-    //     renderUI();
-    //     checkOpponentConnection();
-    //     if (!timerInterval && gameData.createdAt) {
-    //         startSessionTimer(gameData.createdAt);
-    //     }
-    // });
+    unsubscribeGame = onSnapshot(gameRef, (docSnap) => {
+        if (!docSnap.exists()) {
+            alert('La partida ha sido eliminada o no existe.');
+            window.location.href = 'index.html';
+            return;
+        }
+        gameData = docSnap.data();
+        renderUI();
+        checkOpponentConnection();
+        
+        // Iniciar el temporizador si no está corriendo y la partida tiene fecha de creación
+        if (!timerInterval && gameData.createdAt) {
+            const startTime = gameData.createdAt.toMillis();
+            startSessionTimer(startTime);
+        }
+    });
 }
 
-// ** 3. RENDERIZADO DE LA INTERFAZ **
+// ** 4. RENDERIZADO DE LA INTERFAZ **
 
 /**
  * Actualiza toda la interfaz de usuario basándose en los datos de Firebase.
- *
+ */
 function renderUI() {
+    if (!gameData) return;
     renderBoard();
     updateScoresAndNames();
     updateTurnIndicator();
@@ -120,7 +113,7 @@ function renderUI() {
 
 /**
  * Dibuja el tablero en la pantalla.
- *
+ */
 function renderBoard() {
     boardDiv.innerHTML = '';
     gameData.board.forEach((cell, index) => {
@@ -137,7 +130,7 @@ function renderBoard() {
 
 /**
  * Actualiza los marcadores y nombres de los jugadores.
- *
+ */
 function updateScoresAndNames() {
     scoreX.textContent = gameData.scores.X;
     scoreO.textContent = gameData.scores.O;
@@ -147,9 +140,11 @@ function updateScoresAndNames() {
 
 /**
  * Muestra a quién le toca jugar o el resultado de la partida.
- *
+ */
 function updateTurnIndicator() {
-    if (gameData.status === 'IN_PROGRESS') {
+    if (gameData.status === 'WAITING') {
+        turnIndicator.textContent = 'Esperando al Jugador O';
+    } else if (gameData.status === 'IN_PROGRESS') {
         turnIndicator.textContent = `Turno de ${gameData.turn}`;
     } else if (gameData.status === 'FINISHED') {
         const winner = checkWinner(gameData.board);
@@ -159,14 +154,11 @@ function updateTurnIndicator() {
             turnIndicator.textContent = '¡Es un empate!';
         }
     }
-     else if (gameData.status === 'WAITING') {
-        turnIndicator.textContent = 'Esperando al Jugador O';
-    }
 }
 
 /**
  * Muestra u oculta el botón de "Nueva Ronda" si la partida ha terminado.
- *
+ */
 function checkGameStatus() {
     if (gameData.status === 'FINISHED') {
         newRoundBtn.style.display = 'block';
@@ -175,51 +167,54 @@ function checkGameStatus() {
     }
 }
 
-// ** 4. LÓGICA DEL JUEGO **
+// ** 5. LÓGICA DEL JUEGO **
 
 /**
  * Maneja el clic en una casilla del tablero.
  * @param {Event} e - El evento de clic.
- *
-function handleCellClick(e) {
-    if (e.target.className !== 'cell') return; // Clic fuera de una casilla
+ */
+async function handleCellClick(e) {
+    if (e.target.className !== 'cell') return;
 
-    // Validaciones para permitir el movimiento
-    if (gameData.status !== 'IN_PROGRESS') return;
-    if (gameData.turn !== playerSymbol) return; // No es tu turno
+    if (gameData.status !== 'IN_PROGRESS' || gameData.turn !== playerSymbol) {
+        return; // No es tu turno o la partida no está en curso
+    }
 
     const index = parseInt(e.target.dataset.index);
-    if (gameData.board[index] !== ' ') return; // Casilla no vacía
+    if (gameData.board[index] !== ' ') {
+        return; // Casilla no vacía
+    }
 
-    // Realizar el movimiento
     const newBoard = [...gameData.board];
     newBoard[index] = playerSymbol;
 
     const winner = checkWinner(newBoard);
-    const updates = {};
+    const updates = {
+        board: newBoard
+    };
 
     if (winner) {
         updates.status = 'FINISHED';
         if (winner !== 'draw') {
-            updates[`scores/${winner}`] = gameData.scores[winner] + 1;
+            // Usamos notación de punto para actualizar campos anidados en Firestore
+            updates[`scores.${winner}`] = gameData.scores[winner] + 1;
         }
     } else {
         updates.turn = opponentSymbol;
     }
-    updates.board = newBoard;
 
-    // Enviar el estado actualizado a Firebase
-    // gameRef.update(updates); // <- Comentado: Necesita ser adaptado a Firestore
-    
-    // Ejemplo de cómo sería con Firestore:
-    // updateDoc(gameRef, updates);
+    try {
+        await updateDoc(gameRef, updates);
+    } catch (error) {
+        console.error("Error al realizar el movimiento:", error);
+    }
 }
 
 /**
  * Comprueba si hay un ganador o si es un empate.
  * @param {string[]} board - El estado actual del tablero.
  * @returns {string|null|'draw'} - 'X', 'O', 'draw', o null si el juego continúa.
- *
+ */
 function checkWinner(board) {
     const winningCombos = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8], // Horizontales
@@ -243,11 +238,10 @@ function checkWinner(board) {
 
 /**
  * Prepara el estado para una nueva ronda y lo sube a Firebase.
- *
-function startNewRound() {
+ */
+async function startNewRound() {
     if (gameData.status !== 'FINISHED') return;
 
-    // Alternar quién empieza la siguiente ronda
     const nextStarter = gameData.gameStarter === 'X' ? 'O' : 'X';
 
     const updates = {
@@ -257,32 +251,38 @@ function startNewRound() {
         status: 'IN_PROGRESS'
     };
 
-    // gameRef.update(updates); // <- Comentado: Necesita ser adaptado a Firestore
-    // Ejemplo de cómo sería con Firestore:
-    // updateDoc(gameRef, updates);
+    try {
+        await updateDoc(gameRef, updates);
+    } catch (error) {
+        console.error("Error al iniciar nueva ronda:", error);
+    }
 }
 
-// ** 5. UTILIDADES (HEARTBEAT Y TEMPORIZADOR) **
+// ** 6. UTILIDADES (HEARTBEAT Y TEMPORIZADOR) **
 
 /**
  * Inicia un intervalo para actualizar el timestamp `lastActive` del jugador.
  * Esto permite detectar si un jugador se ha desconectado.
- *
+ */
 function startHeartbeat() {
-    heartbeatInterval = setInterval(() => {
-        // if (gameRef) { ... } // <- Comentado: Necesita ser adaptado a Firestore
-        
-        // Ejemplo de cómo sería con Firestore:
-        // if (gameRef) {
-        //     const playerRef = doc(db, "games", roomId, "players", playerSymbol);
-        //     updateDoc(playerRef, { lastActive: serverTimestamp() }); // serverTimestamp necesita importarse
-        // }
+    heartbeatInterval = setInterval(async () => {
+        if (gameRef) {
+            try {
+                // Actualiza el campo 'lastActive' del jugador actual
+                await updateDoc(gameRef, {
+                    [`players.${playerSymbol}.lastActive`]: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Error en el heartbeat:", error);
+                clearInterval(heartbeatInterval); // Detener si hay un error (ej. permisos)
+            }
+        }
     }, 30000); // Cada 30 segundos
 }
 
 /**
  * Comprueba la última vez que el oponente estuvo activo.
- *
+ */
 function checkOpponentConnection() {
     const opponent = gameData.players[opponentSymbol];
     if (!opponent || !opponent.lastActive) {
@@ -291,10 +291,12 @@ function checkOpponentConnection() {
         return;
     }
 
+    // El timestamp de Firestore se convierte a milisegundos
+    const lastActiveMillis = opponent.lastActive.toMillis();
     const now = Date.now();
-    const timeSinceActive = now - opponent.lastActive;
+    const timeSinceActive = now - lastActiveMillis;
 
-    if (timeSinceActive > 60000) { // Más de 60 segundos
+    if (timeSinceActive > 65000) { // Más de 65 segundos (con un pequeño margen)
         opponentStatusDisplay.textContent = 'Desconectado';
         opponentStatusDisplay.className = 'disconnected';
     } else {
@@ -305,9 +307,11 @@ function checkOpponentConnection() {
 
 /**
  * Inicia el temporizador de la sesión de juego.
- * @param {number} startTime - El timestamp de creación de la partida.
- *
+ * @param {number} startTime - El timestamp de creación de la partida en milisegundos.
+ */
 function startSessionTimer(startTime) {
+    if (timerInterval) clearInterval(timerInterval); // Limpiar intervalo anterior si existe
+
     timerInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
         const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
@@ -315,5 +319,3 @@ function startSessionTimer(startTime) {
         timerDisplay.textContent = `${minutes}:${seconds}`;
     }, 1000);
 }
-
-*/
