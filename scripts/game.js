@@ -29,9 +29,8 @@ const playerNameX = document.getElementById('player-name-X');
 const playerNameO = document.getElementById('player-name-O');
 const newRoundBtn = document.getElementById('new-round-btn');
 const roomIdDisplay = document.getElementById('room-id');
+const copyRoomIdBtn = document.getElementById('copy-room-id-btn');
 const timerDisplay = document.getElementById('timer');
-const opponentStatusDisplay = document.getElementById('opponent-status');
-const opponentSymbolDisplay = document.getElementById('opponent-symbol');
 
 // Variables de estado del juego
 let roomId, playerSymbol, opponentSymbol, gameRef, gameData;
@@ -55,13 +54,13 @@ window.addEventListener('load', () => {
     gameRef = doc(db, "games", roomId);
 
     roomIdDisplay.textContent = roomId;
-    opponentSymbolDisplay.textContent = opponentSymbol;
 
     listenToGameChanges();
     startHeartbeat();
 
     boardDiv.addEventListener('click', handleCellClick);
     newRoundBtn.addEventListener('click', startNewRound);
+    copyRoomIdBtn.addEventListener('click', copyRoomIdToClipboard);
 });
 
 // Limpiar intervalos y listeners al salir de la página
@@ -329,6 +328,24 @@ async function startNewRound() {
 // ** 6. UTILIDADES (HEARTBEAT, TEMPORIZADOR, TOAST) **
 
 /**
+ * Copia el ID de la sala al portapapeles.
+ */
+function copyRoomIdToClipboard() {
+    if (!roomId) return;
+    navigator.clipboard.writeText(roomId).then(() => {
+        copyRoomIdBtn.textContent = '¡Copiado!';
+        copyRoomIdBtn.classList.add('copied');
+        setTimeout(() => {
+            copyRoomIdBtn.textContent = 'Copiar';
+            copyRoomIdBtn.classList.remove('copied');
+        }, 2000);
+    }).catch(err => {
+        console.error('Error al copiar el ID:', err);
+        alert('No se pudo copiar el ID.');
+    });
+}
+
+/**
  * Muestra una notificación flotante (toast).
  */
 function showToast(message) {
@@ -369,8 +386,10 @@ function checkOpponentConnection() {
     const opponentIndicator = document.getElementById(`connection-indicator-${opponentSymbol}`);
 
     if (!opponent || !opponent.name || !opponentIndicator) {
-        opponentIndicator.classList.remove('connected');
-        opponentIndicator.classList.remove('disconnected');
+        if(opponentIndicator) {
+            opponentIndicator.classList.remove('connected');
+            opponentIndicator.classList.remove('disconnected');
+        }
         return;
     }
 

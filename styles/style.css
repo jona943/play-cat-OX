@@ -123,8 +123,15 @@ body::before {
 #header-logo {
     width: 40px;
     height: 40px;
-    border-radius: 8px;
+    border-radius: 50%; /* Make it a circle */
     object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#header-logo:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
 }
 
 .main-content {
@@ -268,6 +275,22 @@ html[data-theme='dark'] .back-to-lobby img {
     color: var(--text-primary);
 }
 
+.player-symbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 1rem;
+    background-color: var(--input-border);
+    color: var(--text-primary);
+}
+
+#player-info-X .player-symbol { color: var(--symbol-x-color); }
+#player-info-O .player-symbol { color: var(--symbol-o-color); }
+
 .player-info .score { font-size: 1.75rem; font-weight: 700; color: var(--text-secondary); margin-top: 4px; }
 
 #turn-indicator { font-size: 1.2rem; font-weight: 600; color: var(--text-secondary); text-align: center; padding: 8px 16px; background: var(--input-bg); border-radius: 12px; }
@@ -295,12 +318,13 @@ html[data-theme='dark'] .back-to-lobby img {
     color: var(--text-secondary);
     cursor: pointer;
     border: none;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 #copy-room-id-btn:hover {
     background-color: var(--text-secondary);
     color: var(--card-bg);
+    transform: scale(1.05);
 }
 
 #copy-room-id-btn.copied {
