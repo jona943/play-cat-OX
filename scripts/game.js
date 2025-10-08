@@ -20,6 +20,7 @@ const db = getFirestore(app);
 // ** 1. REFERENCIAS A ELEMENTOS DEL DOM Y ESTADO **
 
 // Referencias a elementos del DOM
+const themeToggle = document.getElementById('theme-toggle');
 const boardDiv = document.getElementById('board');
 const turnIndicator = document.getElementById('turn-indicator');
 const scoreX = document.getElementById('score-X');
@@ -93,23 +94,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /**
  * Escucha cambios en el documento de la partida en Firestore.
- * Esta es la función principal que mantiene el juego sincronizado.
  */
 function listenToGameChanges() {
+    let isFirstLoad = true;
     unsubscribeGame = onSnapshot(gameRef, (docSnap) => {
         if (!docSnap.exists()) {
             alert('La partida ha sido eliminada o no existe.');
             window.location.href = 'index.html';
             return;
         }
+        
+        const oldStatus = gameData ? gameData.status : null;
         gameData = docSnap.data();
+        
         renderUI();
         checkOpponentConnection();
         
+        // Mostrar toast solo cuando el estado cambia a FINISHED
+        if (oldStatus === 'IN_PROGRESS' && gameData.status === 'FINISHED') {
+            if (gameData.winner === playerSymbol) {
+                showToast('¡Ganaste la ronda!');
+            } else if (gameData.winner === 'draw') {
+                showToast('¡Es un empate!');
+            } else {
+                showToast(`¡${gameData.winner} ha ganado!`);
+            }
+        }
+
         // Iniciar el temporizador si no está corriendo y la partida tiene fecha de creación
-        if (!timerInterval && gameData.createdAt) {
+        if (isFirstLoad && gameData.createdAt) {
             const startTime = gameData.createdAt.toMillis();
             startSessionTimer(startTime);
+            isFirstLoad = false;
         }
     });
 }
@@ -131,6 +147,14 @@ function renderUI() {
         if (activePlayerInfo) {
             activePlayerInfo.classList.add('active-turn');
         }
+        // Activar/desactivar tablero
+        if (gameData.turn !== playerSymbol) {
+            boardDiv.classList.add('board-inactive');
+        } else {
+            boardDiv.classList.remove('board-inactive');
+        }
+    } else {
+        boardDiv.classList.add('board-inactive');
     }
 
     renderBoard();
@@ -148,10 +172,17 @@ function renderBoard() {
         const cellDiv = document.createElement('div');
         cellDiv.classList.add('cell');
         cellDiv.dataset.index = index;
-        cellDiv.textContent = cell.trim();
-        if (cell !== ' ') {
-            cellDiv.classList.add(cell);
+
+        if (cell.trim() !== '') {
+            cellDiv.innerHTML = `<span class="symbol">${cell.trim()}</span>`;
+            cellDiv.classList.add(cell.trim());
         }
+        
+        // Resaltar línea ganadora
+        if (gameData.winningCombo && gameData.winningCombo.includes(index)) {
+            cellDiv.classList.add('winning-cell');
+        }
+
         boardDiv.appendChild(cellDiv);
     });
 }
@@ -171,11 +202,11 @@ function updateScoresAndNames() {
  */
 function updateTurnIndicator() {
     if (gameData.status === 'WAITING') {
-        turnIndicator.textContent = 'Esperando al Jugador O';
+        turnIndicator.innerHTML = 'Esperando<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>';
     } else if (gameData.status === 'IN_PROGRESS') {
         turnIndicator.textContent = `Turno de ${gameData.turn}`;
     } else if (gameData.status === 'FINISHED') {
-        const winner = checkWinner(gameData.board);
+        const winner = gameData.winner; // Usar el ganador guardado
         if (winner && winner !== 'draw') {
             turnIndicator.textContent = `¡Ganó ${winner}!`;
         } else {
@@ -189,7 +220,7 @@ function updateTurnIndicator() {
  */
 function checkGameStatus() {
     if (gameData.status === 'FINISHED') {
-        newRoundBtn.style.display = 'block';
+        newRoundBtn.style.display = 'flex';
     } else {
         newRoundBtn.style.display = 'none';
     }
@@ -199,16 +230,17 @@ function checkGameStatus() {
 
 /**
  * Maneja el clic en una casilla del tablero.
- * @param {Event} e - El evento de clic.
  */
 async function handleCellClick(e) {
-    if (e.target.className !== 'cell') return;
+    // Usar .closest para asegurar que el clic dentro de la celda (en el span) también funcione
+    const cell = e.target.closest('.cell');
+    if (!cell) return;
 
     if (gameData.status !== 'IN_PROGRESS' || gameData.turn !== playerSymbol) {
         return; // No es tu turno o la partida no está en curso
     }
 
-    const index = parseInt(e.target.dataset.index);
+    const index = parseInt(cell.dataset.index);
     if (gameData.board[index] !== ' ') {
         return; // Casilla no vacía
     }
@@ -216,16 +248,17 @@ async function handleCellClick(e) {
     const newBoard = [...gameData.board];
     newBoard[index] = playerSymbol;
 
-    const winner = checkWinner(newBoard);
+    const result = checkWinner(newBoard);
     const updates = {
         board: newBoard
     };
 
-    if (winner) {
+    if (result) {
         updates.status = 'FINISHED';
-        if (winner !== 'draw') {
-            // Usamos notación de punto para actualizar campos anidados en Firestore
-            updates[`scores.${winner}`] = gameData.scores[winner] + 1;
+        updates.winner = result.winner; // Guardar el ganador
+        if (result.winner !== 'draw') {
+            updates[`scores.${result.winner}`] = gameData.scores[result.winner] + 1;
+            updates.winningCombo = result.combo; // Guardar el combo ganador
         }
     } else {
         updates.turn = opponentSymbol;
@@ -240,8 +273,6 @@ async function handleCellClick(e) {
 
 /**
  * Comprueba si hay un ganador o si es un empate.
- * @param {string[]} board - El estado actual del tablero.
- * @returns {string|null|'draw'} - 'X', 'O', 'draw', o null si el juego continúa.
  */
 function checkWinner(board) {
     const winningCombos = [
@@ -253,12 +284,12 @@ function checkWinner(board) {
     for (const combo of winningCombos) {
         const [a, b, c] = combo;
         if (board[a] !== ' ' && board[a] === board[b] && board[a] === board[c]) {
-            return board[a]; // Retorna 'X' o 'O'
+            return { winner: board[a], combo }; // Retorna ganador y combo
         }
     }
 
     if (!board.includes(' ')) {
-        return 'draw'; // Empate
+        return { winner: 'draw', combo: null }; // Empate
     }
 
     return null; // El juego continúa
@@ -276,7 +307,9 @@ async function startNewRound() {
         board: Array(9).fill(' '),
         turn: nextStarter,
         gameStarter: nextStarter,
-        status: 'IN_PROGRESS'
+        status: 'IN_PROGRESS',
+        winner: null,
+        winningCombo: null
     };
 
     try {
@@ -286,23 +319,36 @@ async function startNewRound() {
     }
 }
 
-// ** 6. UTILIDADES (HEARTBEAT Y TEMPORIZADOR) **
+// ** 6. UTILIDADES (HEARTBEAT, TEMPORIZADOR, TOAST) **
+
+/**
+ * Muestra una notificación flotante (toast).
+ */
+function showToast(message) {
+    const toast = document.getElementById('toast-notification');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add('show');
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000); // Ocultar después de 4 segundos
+}
 
 /**
  * Inicia un intervalo para actualizar el timestamp `lastActive` del jugador.
- * Esto permite detectar si un jugador se ha desconectado.
  */
 function startHeartbeat() {
     heartbeatInterval = setInterval(async () => {
         if (gameRef) {
             try {
-                // Actualiza el campo 'lastActive' del jugador actual
                 await updateDoc(gameRef, {
                     [`players.${playerSymbol}.lastActive`]: serverTimestamp()
                 });
             } catch (error) {
                 console.error("Error en el heartbeat:", error);
-                clearInterval(heartbeatInterval); // Detener si hay un error (ej. permisos)
+                clearInterval(heartbeatInterval);
             }
         }
     }, 30000); // Cada 30 segundos
@@ -319,12 +365,11 @@ function checkOpponentConnection() {
         return;
     }
 
-    // El timestamp de Firestore se convierte a milisegundos
     const lastActiveMillis = opponent.lastActive.toMillis();
     const now = Date.now();
     const timeSinceActive = now - lastActiveMillis;
 
-    if (timeSinceActive > 65000) { // Más de 65 segundos (con un pequeño margen)
+    if (timeSinceActive > 65000) { // Más de 65 segundos
         opponentStatusDisplay.textContent = 'Desconectado';
         opponentStatusDisplay.className = 'disconnected';
     } else {
@@ -335,10 +380,9 @@ function checkOpponentConnection() {
 
 /**
  * Inicia el temporizador de la sesión de juego.
- * @param {number} startTime - El timestamp de creación de la partida en milisegundos.
  */
 function startSessionTimer(startTime) {
-    if (timerInterval) clearInterval(timerInterval); // Limpiar intervalo anterior si existe
+    if (timerInterval) clearInterval(timerInterval);
 
     timerInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);

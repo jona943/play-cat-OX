@@ -434,20 +434,104 @@ input[type="text"]:focus {
 }
 
 /* --- 8. Theme Switcher y Marca de Agua --- */
-.theme-switcher {
+
+/* Contenedor principal del nuevo switcher */
+.theme-switcher-container {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 24px;
+    right: 24px;
     z-index: 10;
 }
 
-#theme-toggle { display: none; }
-#theme-toggle + label {
-    font-size: 1.75rem;
-    cursor: pointer;
-    line-height: 1;
+/* Ocultar el checkbox real */
+.theme-switcher-checkbox {
+    display: none;
 }
-/* (El resto de la lógica del switcher ya está bien) */
+
+/* El fondo del interruptor (la pista) */
+.theme-switcher-label {
+    display: block;
+    width: 60px;
+    height: 30px;
+    background-color: var(--input-bg);
+    border-radius: 15px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* El círculo que se desliza (el pulgar) */
+.theme-switcher-thumb {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 24px;
+    height: 24px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Icono de la LUNA (visible por defecto en modo oscuro) */
+.theme-switcher-thumb::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 14px;
+    height: 14px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: -3px -3px 0 3px var(--accent-secondary);
+    transition: all 0.3s ease;
+    transform: scale(1);
+}
+
+/* Icono del SOL (oculto por defecto) */
+.theme-switcher-thumb::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px;
+    background-color: var(--accent-primary);
+    border-radius: 50%;
+    transform: scale(0);
+    transition: all 0.3s ease;
+    /* Rayos del sol con box-shadow */
+    box-shadow: 0 -10px 0 -3px #fff, 0 10px 0 -3px #fff, 10px 0 0 -3px #fff, -10px 0 0 -3px #fff,
+                7px -7px 0 -3px #fff, -7px 7px 0 -3px #fff, 7px 7px 0 -3px #fff, -7px -7px 0 -3px #fff;
+}
+
+
+/* --- ESTADO ACTIVADO (MODO CLARO) --- */
+
+/* Mover el pulgar a la derecha */
+.theme-switcher-checkbox:checked + .theme-switcher-label .theme-switcher-thumb {
+    transform: translateX(29px);
+}
+
+/* Ocultar la luna */
+.theme-switcher-checkbox:checked + .theme-switcher-label .theme-switcher-thumb::before {
+    transform: scale(0);
+}
+
+/* Mostrar el sol */
+.theme-switcher-checkbox:checked + .theme-switcher-label .theme-switcher-thumb::after {
+    transform: scale(1) rotate(360deg);
+    background-color: var(--accent-primary);
+    box-shadow: 0 -10px 0 -3px var(--accent-primary), 0 10px 0 -3px var(--accent-primary), 10px 0 0 -3px var(--accent-primary), -10px 0 0 -3px var(--accent-primary),
+                7px -7px 0 -3px var(--accent-primary), -7px 7px 0 -3px var(--accent-primary), 7px 7px 0 -3px var(--accent-primary), -7px -7px 0 -3px var(--accent-primary);
+}
+
+/* Cambiar el color de fondo del interruptor en modo claro */
+html[data-theme='light'] .theme-switcher-label {
+    background-color: var(--accent-secondary);
+}
 
 .watermark {
     position: fixed;
@@ -505,4 +589,112 @@ input[type="text"]:focus {
         top: -25px;
         font-size: 0.9rem;
     }
+}
+
+/* --- 10. UI Polish & Animations --- */
+
+/* Botón Primario Elevado */
+.primary-btn:hover {
+    transform: translateY(-4px); /* Un poco más elevado */
+    box-shadow: var(--shadow-lg); /* Sombra más pronunciada */
+}
+
+/* Indicador de Turno más prominente */
+.player-info.active-turn {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 24px rgba(var(--accent-primary-rgb), 0.6);
+    transform: scale(1.08);
+}
+
+/* Animación de puntos suspensivos para "Esperando..." */
+#turn-indicator .dot {
+    display: inline-block;
+    animation: blink 1.4s infinite;
+}
+#turn-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+#turn-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+}
+
+/* Feedback y Animaciones del Tablero */
+#board.board-inactive .cell {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+#board.board-inactive .cell:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+    border-color: transparent;
+}
+
+.cell:active {
+    transform: scale(0.97);
+    background-color: var(--input-bg);
+}
+
+.cell .symbol {
+    display: inline-block;
+    opacity: 0;
+    transform: scale(0.5);
+    animation: symbol-enter 0.3s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes symbol-enter {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animación para la línea ganadora */
+.cell.winning-cell {
+    background-color: var(--accent-primary);
+    animation: pulse-winner 0.8s infinite;
+}
+
+.cell.winning-cell .symbol {
+    color: #fff;
+    text-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+@keyframes pulse-winner {
+    0% { transform: scale(1); box-shadow: var(--shadow-md); }
+    50% { transform: scale(1.05); box-shadow: var(--shadow-lg); }
+    100% { transform: scale(1); box-shadow: var(--shadow-md); }
+}
+
+
+/* Notificación Toast */
+.toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    border-radius: 10px;
+    background: var(--text-primary);
+    color: var(--bg-gradient-start);
+    box-shadow: var(--shadow-lg);
+    font-weight: 600;
+    z-index: 2000;
+    transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.toast.show {
+    bottom: 40px;
+}
+
+/* Pulido de Marca de Agua */
+.watermark {
+    opacity: 0.8;
+    z-index: 1001; /* Asegurar que esté por encima del fondo pero debajo de modales */
+}
+html[data-theme='light'] .watermark {
+    color: var(--text-secondary);
+}
+html[data-theme='dark'] .watermark {
+    color: var(--text-secondary);
 }
