@@ -392,3 +392,88 @@ html[data-theme='light'] .moon {
 #new-round-btn {
     margin-top: 10px;
 }
+
+/* --- Estilos Responsivos --- */
+@media (max-width: 480px) {
+    body {
+        /* Permite un poco de scroll si el contenido es muy alto */
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+
+    /* Ajustes al Lobby */
+    .lobby-container {
+        padding: 20px;
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .symbol-picker {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Ajustes al Modal */
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    /* Ajustes al Juego */
+    .game-wrapper {
+        padding: 10px;
+    }
+
+    .game-container {
+        padding: 15px;
+        gap: 10px;
+        margin-top: 40px;
+    }
+
+    .back-to-lobby, .theme-switcher {
+        top: 10px;
+    }
+    .back-to-lobby { left: 15px; }
+    .theme-switcher { right: 15px; }
+
+    #game-info {
+        padding: 10px;
+        flex-wrap: wrap; /* Permite que los elementos se reordenen */
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .player-info {
+        width: 80px; /* Reducir ancho */
+    }
+    .player-info .score {
+        font-size: 20px;
+    }
+
+    #turn-indicator-container {
+        width: 100%; /* Ocupa todo el ancho para estar centrado */
+        order: -1; /* Mueve el indicador de turno arriba */
+        margin-bottom: 10px;
+    }
+
+    #turn-indicator {
+        font-size: 18px;
+    }
+
+    #board {
+        gap: 5px;
+    }
+
+    .cell {
+        /* El tamaño de la fuente se ajustará dinámicamente con unidades de viewport */
+        font-size: 15vw; 
+        border-width: 1px;
+    }
+
+    #status-bar {
+        font-size: 12px;
+    }
+}
