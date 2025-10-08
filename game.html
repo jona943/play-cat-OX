@@ -22,7 +22,7 @@
 
     <main class="main-content">
         <div class="game-wrapper">
-            <a href="/index.html" class="back-to-lobby">← Volver al Lobby</a>
+            <a href="/index.html" class="back-to-lobby" title="Volver al Lobby">🏠</a>
 
             <div class="game-container">
                 <div id="status-bar">
@@ -32,14 +32,20 @@
 
                 <div id="game-info">
                     <div id="player-info-X" class="player-info">
-                        <span id="player-name-X">Jugador X</span>
+                        <div class="player-name-wrapper">
+                            <span id="player-name-X">Jugador X</span>
+                            <span id="connection-indicator-X" class="connection-indicator"></span>
+                        </div>
                         <span id="score-X" class="score">0</span>
                     </div>
                     <div id="turn-indicator-container">
                         <h2 id="turn-indicator">Cargando...</h2>
                     </div>
                     <div id="player-info-O" class="player-info">
-                        <span id="player-name-O">Jugador O</span>
+                        <div class="player-name-wrapper">
+                            <span id="player-name-O">Jugador O</span>
+                            <span id="connection-indicator-O" class="connection-indicator"></span>
+                        </div>
                         <span id="score-O" class="score">0</span>
                     </div>
                 </div>

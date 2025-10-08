@@ -157,6 +157,13 @@ function renderUI() {
         boardDiv.classList.add('board-inactive');
     }
 
+    // Actualizar indicador de conexión propio
+    const myIndicator = document.getElementById(`connection-indicator-${playerSymbol}`);
+    if (myIndicator) {
+        myIndicator.classList.add('connected');
+        myIndicator.classList.remove('disconnected');
+    }
+
     renderBoard();
     updateScoresAndNames();
     updateTurnIndicator();
@@ -359,9 +366,17 @@ function startHeartbeat() {
  */
 function checkOpponentConnection() {
     const opponent = gameData.players[opponentSymbol];
-    if (!opponent || !opponent.lastActive) {
-        opponentStatusDisplay.textContent = 'Esperando...';
-        opponentStatusDisplay.className = '';
+    const opponentIndicator = document.getElementById(`connection-indicator-${opponentSymbol}`);
+
+    if (!opponent || !opponent.name || !opponentIndicator) {
+        opponentIndicator.classList.remove('connected');
+        opponentIndicator.classList.remove('disconnected');
+        return;
+    }
+
+    if (!opponent.lastActive) {
+        opponentIndicator.classList.add('disconnected');
+        opponentIndicator.classList.remove('connected');
         return;
     }
 
@@ -370,11 +385,11 @@ function checkOpponentConnection() {
     const timeSinceActive = now - lastActiveMillis;
 
     if (timeSinceActive > 65000) { // Más de 65 segundos
-        opponentStatusDisplay.textContent = 'Desconectado';
-        opponentStatusDisplay.className = 'disconnected';
+        opponentIndicator.classList.add('disconnected');
+        opponentIndicator.classList.remove('connected');
     } else {
-        opponentStatusDisplay.textContent = 'Conectado';
-        opponentStatusDisplay.className = 'connected';
+        opponentIndicator.classList.add('connected');
+        opponentIndicator.classList.remove('disconnected');
     }
 }
 
