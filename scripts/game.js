@@ -72,6 +72,22 @@ window.addEventListener('beforeunload', () => {
     clearInterval(timerInterval);
 });
 
+// --- Lógica del Theme Switcher ---
+themeToggle.addEventListener('change', () => {
+    const theme = themeToggle.checked ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme); // Guardar preferencia
+});
+
+// Cargar preferencia de tema al iniciar
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (themeToggle) {
+        themeToggle.checked = savedTheme === 'light';
+    }
+});
+
 
 // ** 3. SINCRONIZACIÓN CON FIREBASE **
 

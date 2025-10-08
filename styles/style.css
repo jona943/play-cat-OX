@@ -1,92 +1,311 @@
-/* Estilos Generales */
+/* Estilos Generales y Theming */
+:root {
+    --bg-color: #f0f2f5;
+    --text-color: #1c1e21;
+    --container-bg: #ffffff;
+    --input-bg: #ffffff;
+    --input-border: #dddfe2;
+    --input-focus-border: #1877f2;
+    --input-focus-shadow: #e7f3ff;
+    --primary-btn-bg: #1877f2;
+    --primary-btn-hover-bg: #166fe5;
+    --primary-btn-text: #ffffff;
+    --secondary-btn-bg: #e4e6eb;
+    --secondary-btn-hover-bg: #d8dbdf;
+    --secondary-btn-text: #1c1e21;
+    --separator-color: #dddfe2;
+    --symbol-btn-bg: #e4e6eb;
+    --symbol-btn-active-bg: #1877f2;
+    --symbol-btn-text: #1c1e21;
+    --symbol-btn-active-text: #ffffff;
+    --modal-overlay-bg: rgba(0, 0, 0, 0.6);
+}
+
+html[data-theme='dark'] {
+    --bg-color: #121212;
+    --text-color: #e4e6eb;
+    --container-bg: #1e1e1e;
+    --input-bg: #2a2a2a;
+    --input-border: #3e3e3e;
+    --input-focus-border: #4dabf7;
+    --input-focus-shadow: rgba(77, 171, 247, 0.2);
+    --primary-btn-bg: #4dabf7;
+    --primary-btn-hover-bg: #74c0fc;
+    --primary-btn-text: #121212;
+    --secondary-btn-bg: #3a3b3c;
+    --secondary-btn-hover-bg: #505152;
+    --secondary-btn-text: #e4e6eb;
+    --separator-color: #3e3e3e;
+    --symbol-btn-bg: #3a3b3c;
+    --symbol-btn-active-bg: #4dabf7;
+    --symbol-btn-text: #e4e6eb;
+    --symbol-btn-active-text: #121212;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* Contenedor del Lobby */
 .lobby-container {
-    background: #fff;
+    background: var(--container-bg);
     padding: 30px 40px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     text-align: center;
     max-width: 400px;
-    width: 100%;
+    width: 90%;
+    position: relative;
 }
 
 h1 {
-    color: #1c1e21;
     margin-bottom: 25px;
+    font-size: 2rem;
 }
 
-.form-group, .action-group {
+.form-group {
     margin-bottom: 20px;
+    text-align: left;
 }
 
 label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #606770;
 }
 
 input[type="text"] {
-    width: calc(100% - 20px);
+    width: 100%;
     padding: 12px;
-    border: 1px solid #dddfe2;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-color);
     border-radius: 6px;
     font-size: 16px;
+    box-sizing: border-box;
 }
 
 input[type="text"]:focus {
     outline: none;
-    border-color: #1877f2;
-    box-shadow: 0 0 0 2px #e7f3ff;
+    border-color: var(--input-focus-border);
+    box-shadow: 0 0 0 2px var(--input-focus-shadow);
 }
 
+/* Secciones */
+.new-game-section, .join-game-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--separator-color);
+}
+
+.new-game-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+/* Selector de Símbolo */
+.symbol-picker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+.symbol-options {
+    display: flex;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.symbol-btn {
+    padding: 10px 20px;
+    border: none;
+    background-color: var(--symbol-btn-bg);
+    color: var(--symbol-btn-text);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.symbol-btn.active {
+    background-color: var(--symbol-btn-active-bg);
+    color: var(--symbol-btn-active-text);
+}
+
+/* Botones */
 button {
     width: 100%;
     padding: 12px;
     border: none;
     border-radius: 6px;
-    background-color: #1877f2;
-    color: #fff;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 button:hover {
-    background-color: #166fe5;
+    transform: translateY(-2px);
 }
 
-.action-group h2 {
-    font-size: 18px;
-    color: #606770;
-    border-bottom: 1px solid #dddfe2;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+.primary-btn {
+    background-color: var(--primary-btn-bg);
+    color: var(--primary-btn-text);
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-btn-hover-bg);
+}
+
+.secondary-btn {
+    background: none;
+    border: none;
+    color: var(--primary-btn-bg);
+    font-weight: normal;
+    padding: 10px;
+}
+
+.secondary-btn:hover {
+    text-decoration: underline;
+    transform: none;
+}
+
+/* Theme Switcher */
+.theme-switcher {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+#theme-toggle {
+    display: none;
+}
+
+#theme-toggle + label {
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+}
+
+.sun, .moon {
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+html[data-theme='dark'] .sun {
+    opacity: 0;
+    transform: scale(0);
+}
+html[data-theme='light'] .sun {
+    opacity: 1;
+    transform: scale(1);
+}
+
+html[data-theme='dark'] .moon {
+    opacity: 1;
+    transform: scale(1);
+    position: absolute;
+}
+html[data-theme='light'] .moon {
+    opacity: 0;
+    transform: scale(0);
+}
+
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-overlay-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--container-bg);
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.close-modal:hover {
+    opacity: 1;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.modal-content input[type="text"] {
+    margin-bottom: 20px;
 }
 
 /* Contenedor del Juego */
+.game-wrapper {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.back-to-lobby {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    color: var(--text-color);
+    text-decoration: none;
+    opacity: 0.8;
+}
+.back-to-lobby:hover {
+    opacity: 1;
+}
+
 .game-container {
-    background: #fff;
+    background: var(--container-bg);
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    margin-top: 50px; /* Espacio para el botón de volver y el switcher */
 }
 
 /* Barra de estado superior */
@@ -94,7 +313,7 @@ button:hover {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    color: #606770;
+    opacity: 0.8;
     padding: 0 10px;
 }
 
@@ -103,8 +322,8 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    background-color: #f7f7f7;
+    padding: 15px;
+    background-color: var(--bg-color);
     border-radius: 8px;
 }
 
@@ -118,7 +337,7 @@ button:hover {
 
 .player-info .score {
     font-size: 24px;
-    color: #1877f2;
+    color: var(--primary-btn-bg);
 }
 
 #turn-indicator-container {
@@ -128,6 +347,7 @@ button:hover {
 #turn-indicator {
     margin: 0;
     font-size: 20px;
+    font-weight: 600;
 }
 
 /* Tablero */
@@ -140,7 +360,8 @@ button:hover {
 .cell {
     width: 100%;
     aspect-ratio: 1 / 1;
-    background-color: #e7f3ff;
+    background-color: var(--input-bg);
+    border: 2px solid var(--input-border);
     border-radius: 8px;
     display: flex;
     justify-content: center;
@@ -148,11 +369,11 @@ button:hover {
     font-size: 4rem;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .cell:hover {
-    background-color: #d1e6ff;
+    background-color: var(--bg-color);
 }
 
 .cell.X { color: #d9534f; }
@@ -161,7 +382,7 @@ button:hover {
 /* Estado del oponente */
 #opponent-status-container {
     text-align: center;
-    color: #606770;
+    opacity: 0.8;
 }
 
 #opponent-status.connected { color: #5cb85c; font-weight: bold; }
@@ -170,9 +391,4 @@ button:hover {
 /* Botón de nueva ronda */
 #new-round-btn {
     margin-top: 10px;
-    background-color: #5cb85c;
-}
-
-#new-round-btn:hover {
-    background-color: #4cae4c;
 }

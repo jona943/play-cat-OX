@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,33 +7,44 @@
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <div class="game-container">
-        <div id="status-bar">
-            <div class="status-item">ID de Sala: <strong id="room-id"></strong></div>
-            <div class="status-item">Tiempo: <strong id="timer">00:00</strong></div>
+    <div class="game-wrapper">
+        <div class="theme-switcher">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle">
+                <span class="sun">☀️</span>
+                <span class="moon">🌙</span>
+            </label>
         </div>
+        <a href="/index.html" class="back-to-lobby">← Volver al Lobby</a>
 
-        <div id="game-info">
-            <div id="player-info-X" class="player-info">
-                <span id="player-name-X">Jugador X</span>
-                <span id="score-X" class="score">0</span>
+        <div class="game-container">
+            <div id="status-bar">
+                <div class="status-item">ID de Sala: <strong id="room-id"></strong></div>
+                <div class="status-item">Tiempo: <strong id="timer">00:00</strong></div>
             </div>
-            <div id="turn-indicator-container">
-                <h2 id="turn-indicator">Cargando...</h2>
+
+            <div id="game-info">
+                <div id="player-info-X" class="player-info">
+                    <span id="player-name-X">Jugador X</span>
+                    <span id="score-X" class="score">0</span>
+                </div>
+                <div id="turn-indicator-container">
+                    <h2 id="turn-indicator">Cargando...</h2>
+                </div>
+                <div id="player-info-O" class="player-info">
+                    <span id="player-name-O">Jugador O</span>
+                    <span id="score-O" class="score">0</span>
+                </div>
             </div>
-            <div id="player-info-O" class="player-info">
-                <span id="player-name-O">Jugador O</span>
-                <span id="score-O" class="score">0</span>
+
+            <div id="board"></div>
+
+            <div id="opponent-status-container">
+                Oponente (<span id="opponent-symbol"></span>): <span id="opponent-status"></span>
             </div>
+
+            <button id="new-round-btn" class="primary-btn" style="display: none;">Iniciar Nueva Ronda</button>
         </div>
-
-        <div id="board"></div>
-
-        <div id="opponent-status-container">
-            Oponente (<span id="opponent-symbol"></span>): <span id="opponent-status"></span>
-        </div>
-
-        <button id="new-round-btn" style="display: none;">Iniciar Nueva Ronda</button>
     </div>
 
     <!-- Lógica del juego -->

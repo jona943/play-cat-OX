@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,26 +8,49 @@
 </head>
 <body>
     <div class="lobby-container">
-        <h1>Gato (Tic-Tac-Toe) en Tiempo Real</h1>
+        <div class="theme-switcher">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle">
+                <span class="sun">☀️</span>
+                <span class="moon">🌙</span>
+            </label>
+        </div>
+
+        <h1>Gato (Tic-Tac-Toe)</h1>
+        
         <div class="form-group">
             <label for="nickname">Tu Apodo:</label>
             <input type="text" id="nickname" placeholder="Ej: Juan" maxlength="15">
         </div>
 
-        <div class="action-group">
-            <h2>Crear Nueva Partida</h2>
-            <button id="createGameBtn">Crear como Jugador "X"</button>
+        <div class="new-game-section">
+            <h2>Iniciar Nueva Partida</h2>
+            <div class="symbol-picker">
+                <span>Empezar como:</span>
+                <div class="symbol-options">
+                    <button class="symbol-btn active" data-symbol="X">X</button>
+                    <button class="symbol-btn" data-symbol="O">O</button>
+                </div>
+            </div>
+            <button id="createGameBtn" class="primary-btn">Crear Partida</button>
         </div>
 
-        <div class="action-group">
-            <h2>Unirse a Partida</h2>
-            <input type="text" id="roomIdInput" placeholder="Ingresa el ID de la sala">
-            <button id="joinGameBtn">Unirse como Jugador "O"</button>
+        <div class="join-game-section">
+            <button id="openJoinModalBtn" class="secondary-btn">¿Quieres ingresar a una partida existente?</button>
         </div>
     </div>
 
-    <!-- Lógica del lobby -->
-    <script type="module" src="scripts/lobby.js"></script>
+    <!-- Modal para unirse a partida -->
+    <div id="joinGameModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Unirse a Partida</h2>
+            <p>Ingresa el código de la sala para unirte a la partida de tu amigo.</p>
+            <input type="text" id="roomIdInput" placeholder="Código de la sala">
+            <button id="joinGameBtn" class="primary-btn">Unirse como Jugador</button>
+        </div>
+    </div>
 
+    <script type="module" src="scripts/lobby.js"></script>
 </body>
 </html>
