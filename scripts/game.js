@@ -121,6 +121,18 @@ function listenToGameChanges() {
  */
 function renderUI() {
     if (!gameData) return;
+
+    // Resaltar jugador activo
+    document.getElementById('player-info-X').classList.remove('active-turn');
+    document.getElementById('player-info-O').classList.remove('active-turn');
+
+    if (gameData.status === 'IN_PROGRESS') {
+        const activePlayerInfo = document.getElementById(`player-info-${gameData.turn}`);
+        if (activePlayerInfo) {
+            activePlayerInfo.classList.add('active-turn');
+        }
+    }
+
     renderBoard();
     updateScoresAndNames();
     updateTurnIndicator();
