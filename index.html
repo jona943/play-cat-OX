@@ -24,8 +24,8 @@
         <div class="lobby-container">
              
             <div class="form-group">
-                <label for="nickname">Tu Apodo:</label>
-                <input type="text" id="nickname" placeholder="Ej: Arianna" maxlength="15">
+                <label for="create-nickname">Tu Apodo:</label>
+                <input type="text" id="create-nickname" placeholder="Ej: Arianna" maxlength="15">
             </div>
 
             <div class="new-game-section">
@@ -51,8 +51,15 @@
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <h2>Unirse a Partida</h2>
-            <p>Ingresa el código de la sala para unirte a la partida de tu amigo.</p>
-            <input type="text" id="roomIdInput" placeholder="Código de la sala">
+            <p>Ingresa tu apodo y el código de la sala para unirte.</p>
+            <div class="form-group">
+                <label for="join-nickname">Tu Apodo:</label>
+                <input type="text" id="join-nickname" placeholder="Ej: Woody" maxlength="15">
+            </div>
+            <div class="form-group">
+                <label for="roomIdInput">Código de Sala:</label>
+                <input type="text" id="roomIdInput" placeholder="Código de la sala">
+            </div>
             <button id="joinGameBtn" class="primary-btn">Unirse como Jugador</button>
         </div>
     </div>
