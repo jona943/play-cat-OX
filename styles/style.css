@@ -237,32 +237,23 @@ input[type="text"]:focus {
     justify-content: center;
     transition: transform 0.2s;
 }
-.back-to-lobby:hover { transform: scale(1.1); }
 
-.icon-home {
-    width: 24px;
-    height: 22px;
-    background-color: var(--text-secondary);
-    position: relative;
-    clip-path: polygon(0 45%, 100% 45%, 100% 100%, 0 100%); /* Base de la casa */
-    transition: background-color 0.2s;
+.back-to-lobby img {
+    width: 28px;
+    height: 28px;
+    transition: filter 0.2s;
 }
 
-.icon-home::before {
-    content: '';
-    position: absolute;
-    top: -11px;
-    left: -4px;
-    width: 32px;
-    height: 18px;
-    background-color: var(--text-secondary);
-    clip-path: polygon(50% 0, 0 100%, 100% 100%); /* Tejado */
-    transition: background-color 0.2s;
+.back-to-lobby:hover {
+    transform: scale(1.1);
 }
 
-.back-to-lobby:hover .icon-home,
-.back-to-lobby:hover .icon-home::before {
-    background-color: var(--text-primary);
+html[data-theme='dark'] .back-to-lobby img {
+    filter: invert(1) opacity(0.8);
+}
+
+.back-to-lobby:hover img {
+    filter: none;
 }
 
 #game-info { display: flex; justify-content: space-between; align-items: center; width: 100%; }
@@ -288,6 +279,35 @@ input[type="text"]:focus {
 .cell.O { color: var(--symbol-o-color); text-shadow: 0 0 15px rgba(var(--symbol-o-rgb), 0.5); }
 
 #status-bar { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-secondary); }
+
+#room-id-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#copy-room-id-btn {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+    background-color: var(--input-border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+#copy-room-id-btn:hover {
+    background-color: var(--text-secondary);
+    color: var(--card-bg);
+}
+
+#copy-room-id-btn.copied {
+    background-color: var(--success-color);
+    color: #fff;
+}
+
 #opponent-status-container { display: none; } /* Oculto, reemplazado por indicadores */
 
 #new-round-btn { margin-top: 1rem; }

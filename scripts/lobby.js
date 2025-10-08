@@ -18,7 +18,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // --- Referencias a elementos del DOM ---
-const nicknameInput = document.getElementById('nickname');
+const createNicknameInput = document.getElementById('create-nickname');
+const joinNicknameInput = document.getElementById('join-nickname');
 const createGameBtn = document.getElementById('createGameBtn');
 const joinGameBtn = document.getElementById('joinGameBtn');
 const roomIdInput = document.getElementById('roomIdInput');
@@ -73,9 +74,9 @@ window.addEventListener('click', (event) => {
 
 // --- Lógica para Crear Partida ---
 createGameBtn.addEventListener('click', async () => {
-    const nickname = nicknameInput.value.trim();
+    const nickname = createNicknameInput.value.trim();
     if (!nickname) {
-        alert('Por favor, ingresa un apodo.');
+        alert('Por favor, ingresa un apodo para crear la partida.');
         return;
     }
 
@@ -107,11 +108,11 @@ createGameBtn.addEventListener('click', async () => {
 
 // --- Lógica para Unirse a Partida ---
 joinGameBtn.addEventListener('click', async () => {
-    const nickname = nicknameInput.value.trim();
+    const nickname = joinNicknameInput.value.trim();
     const roomId = roomIdInput.value.trim().toUpperCase();
 
     if (!nickname) {
-        alert('Por favor, ingresa un apodo.');
+        alert('Por favor, ingresa un apodo para unirte a la partida.');
         return;
     }
     if (!roomId) {

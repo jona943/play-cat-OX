@@ -23,12 +23,15 @@
     <main class="main-content">
         <div class="game-wrapper">
             <a href="/index.html" class="back-to-lobby" title="Volver al Lobby">
-                <div class="icon-home"></div>
+                <img src="img/hogar.png" alt="Volver al Lobby">
             </a>
 
             <div class="game-container">
                 <div id="status-bar">
-                    <div class="status-item">ID de Sala: <strong id="room-id"></strong></div>
+                    <div class="status-item" id="room-id-container">
+                        <span>ID de Sala: <strong id="room-id"></strong></span>
+                        <button id="copy-room-id-btn" title="Copiar ID de la Sala">Copiar</button>
+                    </div>
                     <div class="status-item">Tiempo: <strong id="timer">00:00</strong></div>
                 </div>
 
