@@ -114,10 +114,11 @@ body::before {
     margin-bottom: 0;
 }
 
-#header-icon {
-    width: 32px;
-    height: 32px;
-    /* Estilos para el futuro icono */
+#header-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 30px;
+    object-fit: cover;
 }
 
 .main-content {
