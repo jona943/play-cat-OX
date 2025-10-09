@@ -1,3 +1,18 @@
+/* Centrado del Contenedor Principal (Aplicable a todo móvil) */
+body {
+    display: flex;
+    justify-content: center; /* Centrado Horizontal */
+    align-items: center; /* Centrado Vertical */
+    min-height: 100vh; /* Ocupa el 100% del alto visible */
+    margin: 0;
+    padding: 0;
+}
+
+/* Configuración básica del contenedor del juego */
+.game-container {
+    max-width: 450px; /* Límite para que no sea muy ancho en tabletas */
+    width: 95%; /* Usa la mayoría del ancho disponible */
+}
 /*
   Juego Gato (Tic-Tac-Toe) - Hoja de Estilos
   Diseño por: JonaDev
@@ -448,4 +463,28 @@ html[data-theme='light'] .theme-switcher-label { background-color: var(--accent-
     0% { opacity: 1; }
     50% { opacity: 0.4; }
     100% { opacity: 1; }
+}
+
+/* MEDIA QUERY para Teléfonos con Pantalla Larga (Long/Tall Screens) */
+ @media screen and (min-aspect-ratio: 2/1) {
+    
+    /* 1. Limitar el alto del contenedor del juego (Clave para evitar estiramiento) */
+    .game-container {
+        /* Limita el contenedor principal del juego al 80% del alto visible */
+        max-height: 80vh; 
+        height: auto;
+    }
+
+    /* 2. Ajustar el tamaño del tablero (Opcional, si es muy grande) */
+    #board {
+        max-width: 350px; 
+        margin-top: 20px;
+    }
+    
+    /* 3. Ajustar el padding superior (para barras de URL del navegador) */
+    /* Asegura que el contenido se separe del borde superior e inferior */
+    body {
+        padding-top: 2vh; 
+        padding-bottom: 2vh;
+    }
 }
