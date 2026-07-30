@@ -1,45 +1,54 @@
-# Gato OX - Juego Multijugador en Tiempo Real
+# <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" width="35" height="35" valign="middle" /> Gato OX — Juego Multijugador en Tiempo Real
 
-Este proyecto es una implementación web del clásico juego "Gato" (Tic-Tac-Toe), diseñado para que dos jugadores puedan competir en tiempo real a través de internet.
+[![Language - JavaScript](https://img.shields.io/badge/Language-JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](#)
+[![Backend - Firebase Firestore](https://img.shields.io/badge/Backend-Firebase_Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](#)
+[![Markup - HTML5](https://img.shields.io/badge/Markup-HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](#)
+[![Styling - CSS3](https://img.shields.io/badge/Styling-CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](#)
 
-## Descripción General
+Este proyecto es una aplicación web multijugador en tiempo real del clásico juego **Gato (Tic-Tac-Toe)**. Permite a dos jugadores conectarse remotamente desde diferentes dispositivos, sincronizando cada movimiento al instante mediante **Firebase Firestore**.
 
-El juego permite a un usuario crear una "sala" de juego y compartir un ID único con un oponente. El oponente puede usar este ID para unirse a la partida. La interacción es instantánea gracias al uso de **Firebase Firestore** como backend para sincronizar el estado del juego entre los dos clientes.
+[Visualiza la demo interactiva en GitHub Pages](https://jona943.github.io/play-cat-OX/)
 
-## Características
+---
 
-- **Multijugador en Tiempo Real**: Dos jugadores pueden unirse a una partida desde diferentes dispositivos y ver los movimientos del oponente al instante.
-- **Crear y Unirse a Partidas**: Un jugador crea una sala y el otro se une con un código.
-- **Selector de Símbolo**: El creador de la partida puede elegir empezar como 'X' o 'O'.
-- **Indicadores de Estado**: La interfaz muestra de quién es el turno, el estado de conexión del oponente y el resultado de la partida.
-- **Puntuación y Rondas**: El juego lleva la puntuación a través de múltiples rondas.
-- **Diseño Adaptable**: Interfaz con tema claro y oscuro.
+## <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/chrome/chrome-original.svg" width="22" height="22" valign="middle" /> Características Principales
 
-## ¿Cómo Funciona la Lógica?
+* **Multijugador en Tiempo Real**: Sincronización instantánea de estados y movimientos entre jugadores conectados desde distintos navegadores o teléfonos.
+* **Creación y Unión a Salas**: Sistema de lobby donde un jugador genera un código/ID único de sala y el oponente se une directamente.
+* **Selector de Símbolo e Inmutabilidad**: El creador de la sala define si inicia con la ficha 'X' u 'O'.
+* **Monitoreo de Estado & Heartbeat**: Indicador de conexión activa del oponente en tiempo real y detección automática de victorias, empates y cambio de turnos.
+* **Tema Adaptable (Dark / Light Mode)**: Interfaz con soporte para cambio de tema claro u oscuro de forma reactiva.
 
-La lógica del juego se divide en dos partes principales: el lobby y la partida.
+---
 
-### 1. Lobby (`index.html` y `scripts/lobby.js`)
+## <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg" width="22" height="22" valign="middle" /> Estructura del Repositorio
 
-- El jugador ingresa un apodo.
-- Puede optar por **crear una nueva partida**, eligiendo su símbolo ('X' o 'O'). Al hacerlo, se crea un nuevo documento en Firebase con un ID de sala único.
-- O puede **unirse a una partida existente** ingresando el ID de la sala proporcionado por otro jugador.
-- Una vez que se crea o se une a una sala, el jugador es redirigido a `game.html`.
+```text
+play-cat-OX/
+├── index.html                                          # Pantalla de Lobby (crear o unirse a sala)
+├── game.html                                           # Tablero principal de juego e interfaz multijugador
+├── styles/
+│   └── style.css                                       # Hoja de estilos principal, temas y animaciones
+├── scripts/
+│   ├── lobby.js                                        # Lógica de gestión de salas en Firestore
+│   └── game.js                                         # Observador en tiempo real, validación de turnos y victoria
+├── img/                                                # Recursos gráficos e isotipos del juego
+└── README.md                                           # Documentación técnica del proyecto
+```
 
-### 2. Partida (`game.html` y `scripts/game.js`)
+---
 
-- La página se conecta a la sala de juego específica en Firebase usando el ID de la URL.
-- **Sincronización con Firebase**: El script `game.js` establece un "listener" (observador) en tiempo real sobre el documento de la partida en Firestore. Cualquier cambio en el documento (como un movimiento del oponente) se refleja inmediatamente en la interfaz del jugador.
-- **Manejo de Turnos**: El estado del juego (`gameData`) contiene información sobre de quién es el turno. Un jugador solo puede hacer un movimiento si es su turno.
-- **Movimientos**: Cuando un jugador hace clic en una casilla, el tablero se actualiza localmente y luego se envía la actualización a Firebase. El listener del oponente recibe este cambio y actualiza su propia vista.
-- **Detección de Ganador**: Después de cada movimiento, una función comprueba si hay una combinación ganadora (línea horizontal, vertical o diagonal) o si el tablero está lleno (empate).
-- **Estado de Conexión**: Un sistema de "heartbeat" (latido) actualiza periódicamente una marca de tiempo para cada jugador en Firebase, permitiendo a la interfaz mostrar si el oponente está conectado o desconectado.
+## <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg" width="22" height="22" valign="middle" /> Arquitectura Técnica
 
-## Estructura de Archivos
+1. **Lobby (`index.html` & `scripts/lobby.js`)**:
+   - Captura el apodo del jugador.
+   - Crea un nuevo documento en Firestore con el código único de sala o consulta una sala existente para validar el ingreso del oponente. Redirige dinámicamente a `game.html?gameId=ID`.
+2. **Partida en Vivo (`game.html` & `scripts/game.js`)**:
+   - Escucha activamente con listeners de Firestore (`onSnapshot`) las actualizaciones en tiempo real sobre el documento de la partida.
+   - Comprueba combinaciones ganadoras (horizontales, verticales y diagonales) tras cada movimiento y emite el pulso de presencia (*heartbeat*).
 
-- `index.html`: Página de inicio para crear o unirse a una partida.
-- `game.html`: Página principal donde se desarrolla el juego.
-- `styles/style.css`: Hoja de estilos para toda la aplicación.
-- `scripts/lobby.js`: Lógica para la creación y unión a salas de juego.
-- `scripts/game.js`: Lógica principal del juego, incluyendo la comunicación con Firebase.
-- `img/`: Contiene los recursos gráficos.
+---
+
+<p align="center">
+  <sub>Gato OX Multijugador — Realtime Firebase Game | Desarrollado por Jonathan Medina</sub>
+</p>
